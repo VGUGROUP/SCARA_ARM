@@ -373,16 +373,11 @@ void ClearToSend()
 
 inline void get_coordinates()
 {
-  move_feedrate = default_feedrate; 
   Serial.println("in get coordinate");                                //set the feedrate to the default feedrate in case the command hasn't a feedrate
   for(int i=0; i < NUM_AXIS; i++) {
     if(code_seen(axis_codes[i])) {
       destination_cart[i] = (float)code_value() + (axis_relative_modes[i] || relative_mode)*start_cart[i];
     }
     else destination_cart[i] = start_cart[i];                                                       //Are these else lines really needed?
-  }
-
-  if(code_seen('F')) {
-   move_feedrate = (float)code_value();                             //Set the feedrate for the move
   }
 }
