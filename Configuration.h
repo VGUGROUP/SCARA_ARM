@@ -17,8 +17,7 @@
 #define Z_DIR_PIN          48
 #define Z_ENABLE_PIN       62
 #define Z_MIN_PIN          18
-
-#define VAC_PUMP            9    
+   
 
 // This determines the communication speed of the printer
 #define BAUDRATE 115200
