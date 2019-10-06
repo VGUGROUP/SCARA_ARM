@@ -269,23 +269,6 @@ inline void process_commands()
           stepperY.setCurrentPosition(0);
           steppers.moveTo(position);
           steppers.runSpeedToPosition();  
-
-          // for (int i = 0; i < 50; i= i +2)
-          // {
-          //   position[0] = position[0] + i;
-          //   position[1] = position[1] + i;
-          //   stepperX.setCurrentPosition(0);
-          //   stepperY.setCurrentPosition(0);
-           
-          //   Serial.println("_________________________________________________________");
-          //   Serial.print("Position[0]: "); Serial.println(stepperX.currentPosition());
-          //   Serial.print("Position[1]: "); Serial.println(stepperY.currentPosition());
-          //   Serial.print("i: ");Serial.println(i);
-          //   Serial.println("_________________________________________________________");
-
-          //   steppers.moveTo(position);
-  	      //   steppers.runSpeedToPosition();  
-          // }
         break;       
 //---------------------------------------------------------------------------------------------------------------------------------------------        
       case 28: //G28 Home all Axis one at a time
@@ -327,8 +310,7 @@ inline void process_commands()
         }
       
         // Home Secondary Arm
-        count1 = 0;
-        sec_move = 0;
+   
         endstopstate = 0;
         WRITE(X_ENABLE_PIN,LOW);           //Enable X axis motor
         WRITE(X_DIR_PIN, LOW);             //Direction of travel is towards minus end       
@@ -339,7 +321,6 @@ inline void process_commands()
           WRITE(X_STEP_PIN, LOW);
           delayMicroseconds(100); 
           endstopstate = (READ(X_MIN_PIN));          //Read the endstop condition
-          sec_move++;
         } while (endstopstate == 1);                 //Stop moving if endstop is reached
   
         //Now move back to a 90 degree elbow
@@ -357,33 +338,14 @@ inline void process_commands()
         stepperX.setCurrentPosition(0);
         stepperY.setCurrentPosition(0);
 
-        //Home Z axis 
-        // endstopstate = 0;      
-        // WRITE(Z_ENABLE_PIN,LOW);           //Enable Z axis motor
-        // WRITE(Z_DIR_PIN, HIGH);            //Direction of travel is towards minus end       
-        // do
-        // {
-        //   WRITE(Z_STEP_PIN, HIGH);
-        //   delayMicroseconds(1000);
-        //   WRITE(Z_STEP_PIN, LOW);
-        //   delayMicroseconds(1000); 
-        //   endstopstate = (READ(Z_MIN_PIN));          //Read the endstop condition 
-        // } while (endstopstate != 1);                 //Stop moving if endstop is reached      
-
-   
-        //With the Primary arm pointing straight out and the secondary arm bent exactly 90 degrees we know where the end effector is
-        //Set Datum position
+      
         
         start_cart[0] = 0;       //X Cartesian coordinate is set to zero
         start_cart[1] = 0;       //Y Cartesian coordinate is set to zero
         start_cart[2] = 0;       //Z Cartesian coordinate is set to zero
         
         has_homed = true;                                //Set the flag so moves are now allowed
-        Serial.println("G28 - Homing Axes Complete");
-        Serial.print("Primary Arm Moved "); Serial.print(prim_move); Serial.println(" Steps ");
-        Serial.print("Secondary Arm Moved "); Serial.print(sec_move); Serial.println(" Steps ");
-      
-        
+        Serial.println("G28 - Homing Axes Complete");    
         break;
 //---------------------------------------------------------------------------------------------------------------------------------------------              
     }
@@ -417,12 +379,14 @@ void ClearToSend()
 }
 
 inline void get_coordinates()
-{
-  Serial.println("in get coordinate");                                //set the feedrate to the default feedrate in case the command hasn't a feedrate
+{                       //set the feedrate to the default feedrate in case the command hasn't a feedrate
   for(int i=0; i < NUM_AXIS; i++) {
     if(code_seen(axis_codes[i])) {
-      destination_cart[i] = (float)code_value() + (axis_relative_modes[i] || relative_mode)*start_cart[i];
-    }
-    else destination_cart[i] = start_cart[i];                                                       //Are these else lines really needed?
+      destination_cart[i] = (float)code_value();
+      Serial.println((float)code_value()); 
+    }     
+    else {
+      destination_cart[i] = start_cart[i];   
+    }                                                   //Are these else lines really needed?
   }
 }
