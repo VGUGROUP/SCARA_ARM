@@ -33,19 +33,12 @@ float x_steps_per_degree = 55; //(((200*8)/360)*(40/8)); // formula: ((steps per
 float y_steps_per_degree = 55; //(((200*8)/360)*(40/8)); // formula: ((steps per rev * stepping mode of motor)/360) * Gear Ratio
 float z_steps_per_mm = 40; // (200*8)/(8*5); formula: (steps per rev * stepping mode of motor) / (number of teeth on pulley * belt pitch)
 
-
-float move_feedrate;              //holds the current move feedrate;
-float min_feedrate = 1;           //The minimum feedrate mm/sec 
-float default_feedrate = 15;      //The default feedrate mm/sec
-float XYmax_feedrate = 100;       //The maximum feedrate of the X and Y axes in mm/sec
-float Zmax_feedrate = 40;          //The maximum feedrate of the Z axis in mm/sec
-
 const float PRIM_ARM_LENGTH = 100;      //The length of the primary arm in mm
 const float SEC_ARM_LENGTH = 100;       //The length of the secondary arm in mm
 const float HOME_POS_OFFSET_X = 100;      //The distance in X from the primary arm pivot to zero in cartesian coordinates (Usually same as SEC_ARM_LENGTH)
 const float HOME_POS_OFFSET_Y = 100;    //The distance in Y from the primary arm pivot to zero in cartesian coordinates (Usually same as PRIM_ARM_LENGTH)
 
-const float Y_AXIS_HOME_ANGLE = -20;    //The number of degrees when axis hits end stop during datuming 
+const float Y_AXIS_HOME_ANGLE = -20;    //The number of degrees when axis hits end stop during datuming  
 const float X_AXIS_HOME_ANGLE = 0;      //The number of degrees when axis hits end stop during datuming
 const float Z_AXIS_HOME_POS = 0;        //The number of mm when axis hits end stop during datuming
 
@@ -53,8 +46,7 @@ const float X_MAX = 125;                     //The primary arm can go straight o
 const float X_MIN = X_AXIS_HOME_ANGLE;       //The primary arm can bend in the same angle as the end stop
 const float Y_MAX = 180;                     //The secondary arm can only go out until the end stop angle
 const float Y_MIN = Y_AXIS_HOME_ANGLE;       //The minimuam angle is symmetrical to the end stop
-const float Z_MIN = 0;
-const float Z_MAX = 70;
+
 
 float DistB;                     //The distance between the primary pivot and the end effector
 float Theta;                     //Angle Theta
@@ -68,7 +60,5 @@ const bool INVERT_Z_DIR = true;
 
 //// MOVEMENT SETTINGS
 const int NUM_AXIS = 4; // The axis order in all axis related arrays is X, Y, Z, E
-bool axis_relative_modes[] = {false, false, false, false};
-
 
 #endif

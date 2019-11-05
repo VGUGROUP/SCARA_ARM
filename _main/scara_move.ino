@@ -9,51 +9,55 @@ int B = 0;
 long test_step[51][2];
 float arm_degree;
 float forearm_degree;
-long radius = PRIM_ARM_LENGTH + SEC_ARM_LENGTH;
+long pow_radius = pow((PRIM_ARM_LENGTH + SEC_ARM_LENGTH), 2);
 
+// checking if  destination  coordinate in cartesian inside circle boudary of 2 arm
 bool isCoordinateValid(float Cartersian_coordinate[])
 {
-	long result = sqrt(pow(Cartersian_coordinate[0], 2) + pow(Cartersian_coordinate[1], 2));
+	long result = pow(Cartersian_coordinate[0] + HOME_POS_OFFSET_X, 2) + pow(Cartersian_coordinate[1] + HOME_POS_OFFSET_Y, 2);
 
-	if (result < radius)
+	if (result <= pow_radius)
+	{
 		return true;
+	}
+
 	return false;
 }
 
 void scara_move()
 {
-	//Offset the cartesian coordinates as the zero of the arm is actually under the first pivot
-	start_cart[0] = (start_cart[0] + HOME_POS_OFFSET_X);
-	start_cart[1] = (start_cart[1] + HOME_POS_OFFSET_Y);
-	;
 
 	//Offset the cartesian coordinates as the zero of the arm is actually under the first pivot
-	destination_cart[0] = (destination_cart[0] + HOME_POS_OFFSET_X);
-	destination_cart[1] = (destination_cart[1] + HOME_POS_OFFSET_Y);
 
-	Cartesian_to_Scara(start_cart[0], start_cart[1]);
+	if (isCoordinateValid(destination_cart))
+	{
+		//Offset the cartesian coordinates as the zero of the arm is actually under the first pivot
+		start_cart[0] = (start_cart[0] + HOME_POS_OFFSET_X);
+		start_cart[1] = (start_cart[1] + HOME_POS_OFFSET_Y);
 
-	start_degree[0] = forearm_degree;
-	start_degree[1] = arm_degree;
+		destination_cart[0] = (destination_cart[0] + HOME_POS_OFFSET_X);
+		destination_cart[1] = (destination_cart[1] + HOME_POS_OFFSET_Y);
 
-	Cartesian_to_Scara(destination_cart[0], destination_cart[1]);
+		Cartesian_to_Scara(start_cart[0], start_cart[1]);
 
-	destination_degree[0] = forearm_degree;
-	destination_degree[1] = arm_degree;
+		start_degree[0] = forearm_degree;
+		start_degree[1] = arm_degree;
 
-	degree_to_steps();
-	step[0] = step[0] + A;
-	step[1] = step[1] + B;
+		Cartesian_to_Scara(destination_cart[0], destination_cart[1]);
 
-	A += abs(step[0]);
-	B += abs(step[1]);
+		destination_degree[0] = forearm_degree;
+		destination_degree[1] = arm_degree;
 
-	set_motor_direction();
-	run_motor();
+		degree_to_steps();
 
-	// Reset the current position values (these are the global position variables)
-	start_cart[0] = destination_cart[0] - HOME_POS_OFFSET_X;
-	start_cart[1] = destination_cart[1] - HOME_POS_OFFSET_Y;
+		set_motor_direction();
+		Report_Info();
+		run_motor();
+
+		// Reset the current position values (these are the global position variables)
+		start_cart[0] = destination_cart[0] - HOME_POS_OFFSET_X;
+		start_cart[1] = destination_cart[1] - HOME_POS_OFFSET_X;
+	}
 }
 
 void set_motor_direction()
@@ -92,28 +96,10 @@ void run_motor()
 	WRITE(X_ENABLE_PIN, LOW); //Enable Y axis motor
 	WRITE(Y_ENABLE_PIN, LOW); //Enable Y axis motor
 
-	// stepperX.setCurrentPosition(0);
-	// stepperY.setCurrentPosition(0);
-
+	stepperX.setCurrentPosition(0);
+	stepperY.setCurrentPosition(0);
 	steppers.moveTo(step);
 	steppers.runSpeedToPosition();
-	// steppers.run();
-	// long move[2] = {0, 0};
-	// long moves[100][2];
-	// for (int i = 0; i < 100; i++)
-	// {
-	// 	moves[i][0] = 55;
-	// 	moves[i][1] = 55;
-	// }
-
-	// for (int i = 0; i < 100; i++)
-	// {
-	// 	stepperX.setCurrentPosition(0);
-	// 	stepperY.setCurrentPosition(0);
-	// 	steppers.moveTo(moves[i]);
-	// 	steppers.runSpeedToPosition();
-	// 	Serial.println(i);
-	// }
 
 	Report_Info();
 }
@@ -157,14 +143,14 @@ void degree_to_steps()
 
 void Report_Info() //Feeds back to the host PC information about the move
 {
-	// Serial.print("X: ");
+	// Serial.print("X_start: ");
 	// Serial.println(start_cart[0]);
-	// Serial.print("Y: ");
+	// Serial.print("Y_start: ");
 	// Serial.println(start_cart[1]);
 
-	// Serial.print("X_d: ");
+	// Serial.print("X_destination: ");
 	// Serial.println(destination_cart[0]);
-	// Serial.print("Y_d: ");
+	// Serial.print("Y_destination: ");
 	// Serial.println(destination_cart[1]);
 
 	// Serial.print("X_s_degree: ");

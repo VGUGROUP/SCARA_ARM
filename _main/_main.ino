@@ -292,7 +292,6 @@ inline void process_commands()
       WRITE(Y_DIR_PIN, LOW);    //Direction of travel is towards minus end
       do
       {
-
         WRITE(Y_STEP_PIN, HIGH);
         delayMicroseconds(100);
         WRITE(Y_STEP_PIN, LOW);
@@ -330,6 +329,7 @@ inline void process_commands()
       } while (endstopstate == 1);        //Stop moving if endstop is reached
 
       //Now move back to a 90 degree elbow
+
       WRITE(X_DIR_PIN, HIGH); //Direction of travel is towards negative end
       Calculation = (90) * x_steps_per_degree;
       count1 = (long)Calculation; //We now have the number of steps we want to move;
@@ -347,7 +347,6 @@ inline void process_commands()
 
       start_cart[0] = 0; //X Cartesian coordinate is set to zero
       start_cart[1] = 0; //Y Cartesian coordinate is set to zero
-      start_cart[2] = 0; //Z Cartesian coordinate is set to zero
 
       has_homed = true; //Set the flag so moves are now allowed
       Serial.println("G28 - Homing Axes Complete");
@@ -377,13 +376,11 @@ void FlushSerialRequestResend()
 
 void ClearToSend()
 {
-  //  previous_millis_cmd = millis();
-
   Serial.println("ok");
 }
 
 inline void get_coordinates()
-{ //set the feedrate to the default feedrate in case the command hasn't a feedrate
+{ 
   for (int i = 0; i < NUM_AXIS; i++)
   {
     if (code_seen(axis_codes[i]))
@@ -394,6 +391,6 @@ inline void get_coordinates()
     else
     {
       destination_cart[i] = start_cart[i];
-    } //Are these else lines really needed?
+    } 
   }
 }
