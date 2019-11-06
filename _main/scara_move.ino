@@ -3,12 +3,9 @@
 //Variables to hold the returned data from the Delta Transform routine
 
 long step[2] = {0, 0}; //[0]: X motor - forearm ; [1]:Y motor -arm;[3] Z motor
-int _i = 0;
-int A = 0;
-int B = 0;
-long test_step[51][2];
 float arm_degree;
 float forearm_degree;
+
 long pow_radius = pow((PRIM_ARM_LENGTH + SEC_ARM_LENGTH), 2);
 
 // checking if  destination  coordinate in cartesian inside circle boudary of 2 arm
@@ -38,10 +35,13 @@ void scara_move()
 		destination_cart[0] = (destination_cart[0] + HOME_POS_OFFSET_X);
 		destination_cart[1] = (destination_cart[1] + HOME_POS_OFFSET_Y);
 
+		// Report_Info();
+
 		Cartesian_to_Scara(start_cart[0], start_cart[1]);
 
 		start_degree[0] = forearm_degree;
 		start_degree[1] = arm_degree;
+
 
 		Cartesian_to_Scara(destination_cart[0], destination_cart[1]);
 
@@ -51,7 +51,6 @@ void scara_move()
 		degree_to_steps();
 
 		set_motor_direction();
-		Report_Info();
 		run_motor();
 
 		// Reset the current position values (these are the global position variables)
@@ -101,7 +100,24 @@ void run_motor()
 	steppers.moveTo(step);
 	steppers.runSpeedToPosition();
 
-	Report_Info();
+	 Report_Info();
+}
+
+//Convert current arm degree to cartersian coordinate
+void Scara_to_Cartersian(float m_arm_degree, float m_forearm_degree)
+{
+	arm_degree =  m_arm_degree*0.0174533;
+	forearm_degree = m_forearm_degree*0.0174533;
+
+	start_degree[0] = arm_degree;
+	start_degree[1] = forearm_degree;
+
+
+	start_cart[0] = PRIM_ARM_LENGTH * cos(arm_degree) + SEC_ARM_LENGTH * cos(arm_degree + forearm_degree);
+	start_cart[1] = PRIM_ARM_LENGTH * sin(arm_degree) + SEC_ARM_LENGTH * sin(arm_degree + forearm_degree);
+
+	// Cartesian_to_Scara(start_cart[0],start_cart[1]);
+
 }
 
 void Cartesian_to_Scara(float x_cartesian, float y_cartesian) //Converts XYZ cartesian coordinates into Scara stepper motor steps
@@ -119,6 +135,8 @@ void Cartesian_to_Scara(float x_cartesian, float y_cartesian) //Converts XYZ car
 
 	forearm_degree = (long)(((acos(tophalf / bottomhalf)) * 180 / Pi)); //forearm
 	arm_degree = (long)((Theta - Phi));									// arm
+
+	
 }
 
 void degree_to_steps()
@@ -154,9 +172,9 @@ void Report_Info() //Feeds back to the host PC information about the move
 	// Serial.println(destination_cart[1]);
 
 	// Serial.print("X_s_degree: ");
-	// Serial.println(start_degree[0]);
+	// Serial.println(arm_degree);
 	// Serial.print("Y_s_degree: ");
-	// Serial.println(start_degree[1]);
+	// Serial.println(forearm_degree);
 
 	// Serial.print("X_d_degree: ");
 	// Serial.println(destination_degree[0]);
@@ -164,6 +182,11 @@ void Report_Info() //Feeds back to the host PC information about the move
 	// Serial.println(destination_degree[1]);
 	// Serial.println(step[0]);
 	// Serial.println(step[1]);
+
+	// Serial.print("Current_X:");
+	// Serial.println(start_cart[0]);
+	// Serial.print("Current_Y:");
+	// Serial.println(start_cart[1]);
 
 	Serial.println("Done");
 }

@@ -21,7 +21,7 @@ extern "C" void __cxa_pure_virtual();
 char axis_codes[NUM_AXIS] = {'X', 'Y', 'Z', 'E'};
 
 float start_cart[NUM_AXIS] = {0, 0, 0, 0};       //Holds the X Y Z cartesian coordinates of the current position of the tool head
-float predicted_cart[NUM_AXIS] = {0, 0, 0, 0};   //Holds the predicted X Y Z cartesian coordinates of the tool head at any point in time
+float current_cart[NUM_AXIS] = {0, 0, 0, 0};   //Holds the predicted X Y Z cartesian coordinates of the tool head at any point in time
 float destination_cart[NUM_AXIS] = {0, 0, 0, 0}; //Holds the X Y Z cartesian coordinates of the destination position of the tool head
 
 long start_degree[NUM_AXIS] = {0, 0, 0, 0};       //Holds the start position for the SCARA MOVE in stepper steps (4th value not yet used)
@@ -53,8 +53,8 @@ MultiStepper steppers;
 
 void setup()
 {
-  stepperX.setMaxSpeed(1000);
-  stepperY.setMaxSpeed(1000);
+  stepperX.setMaxSpeed(5000);
+  stepperY.setMaxSpeed(5000);
 
   steppers.addStepper(stepperX);
   steppers.addStepper(stepperY);
@@ -239,27 +239,12 @@ inline void process_commands()
       //---------------------------------------------------------------------------------------------------------------------------------------------
     case 5:
     { // checking for moving series of points
-      int cart_point[50][2];
-      float _x = 0;
-      float _y = 0;
 
-      for (int i = 0; i < 50; i++)
-      {
-
-        destination_cart[0] = _x;
-        destination_cart[1] = _y;
-
-        _y++;
-        _x--;
-
-        // Serial.print("x: ");
-        // Serial.println(_x);
-        // Serial.print("y: ");
-        // Serial.println(_y);
-        scara_move();
+    Scara_to_Cartersian(-20,0);
+    Report_Info();
+  
       
-      }
-      break;
+    break;
     }
       //---------------------------------------------------------------------------------------------------------------------------------------------
     case 6:
@@ -301,18 +286,18 @@ inline void process_commands()
       } while (endstopstate == 1); //Stop moving if endstop is reached
 
       //Now move back to 90 degrees straight out
-      WRITE(Y_DIR_PIN, HIGH); //Direction of travel is towards positive end
-      Calculation = (abs(Y_AXIS_HOME_ANGLE)) * y_steps_per_degree;
+      // WRITE(Y_DIR_PIN, HIGH); //Direction of travel is towards positive end
+      // Calculation = (abs(Y_AXIS_HOME_ANGLE)) * y_steps_per_degree;
 
-      count1 = (long)Calculation; //We now have the number of steps we want to move;
-      while (count1 > 0)
-      {
-        WRITE(Y_STEP_PIN, HIGH);
-        delayMicroseconds(100);
-        WRITE(Y_STEP_PIN, LOW);
-        delayMicroseconds(100);
-        count1--;
-      }
+      // count1 = (long)Calculation; //We now have the number of steps we want to move;
+      // while (count1 > 0)
+      // {
+      //   WRITE(Y_STEP_PIN, HIGH);
+      //   delayMicroseconds(100);
+      //   WRITE(Y_STEP_PIN, LOW);
+      //   delayMicroseconds(100);
+      //   count1--;
+      // }
 
       // Home Secondary Arm
 
@@ -330,26 +315,29 @@ inline void process_commands()
 
       //Now move back to a 90 degree elbow
 
-      WRITE(X_DIR_PIN, HIGH); //Direction of travel is towards negative end
-      Calculation = (90) * x_steps_per_degree;
-      count1 = (long)Calculation; //We now have the number of steps we want to move;
-      while (count1 > 0)
-      {
-        WRITE(X_STEP_PIN, HIGH);
-        delayMicroseconds(100);
-        WRITE(X_STEP_PIN, LOW);
-        delayMicroseconds(100);
-        count1--;
-      }
+      // WRITE(X_DIR_PIN, HIGH); //Direction of travel is towards negative end
+      // Calculation = (90) * x_steps_per_degree;
+      // count1 = (long)Calculation; //We now have the number of steps we want to move;
+      // while (count1 > 0)
+      // {
+      //   WRITE(X_STEP_PIN, HIGH);
+      //   delayMicroseconds(100);
+      //   WRITE(X_STEP_PIN, LOW);
+      //   delayMicroseconds(100);
+      //   count1--;
+      // }
+    
 
       stepperX.setCurrentPosition(0);
       stepperY.setCurrentPosition(0);
 
-      start_cart[0] = 0; //X Cartesian coordinate is set to zero
-      start_cart[1] = 0; //Y Cartesian coordinate is set to zero
+      // start_cart[0] = 0; //X Cartesian coordinate is set to zero
+      // start_cart[1] = 0; //Y Cartesian coordinate is set to zero
+
+      Scara_to_Cartersian(Y_AXIS_HOME_ANGLE,X_AXIS_HOME_ANGLE);
 
       has_homed = true; //Set the flag so moves are now allowed
-      Serial.println("G28 - Homing Axes Complete");
+      Report_Info();
       break;
       //---------------------------------------------------------------------------------------------------------------------------------------------
     }

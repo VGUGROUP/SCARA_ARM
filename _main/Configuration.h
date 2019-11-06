@@ -35,8 +35,8 @@ float z_steps_per_mm = 40; // (200*8)/(8*5); formula: (steps per rev * stepping 
 
 const float PRIM_ARM_LENGTH = 100;      //The length of the primary arm in mm
 const float SEC_ARM_LENGTH = 100;       //The length of the secondary arm in mm
-const float HOME_POS_OFFSET_X = 100;      //The distance in X from the primary arm pivot to zero in cartesian coordinates (Usually same as SEC_ARM_LENGTH)
-const float HOME_POS_OFFSET_Y = 100;    //The distance in Y from the primary arm pivot to zero in cartesian coordinates (Usually same as PRIM_ARM_LENGTH)
+const float HOME_POS_OFFSET_X = 0;      //The distance in X from the primary arm pivot to zero in cartesian coordinates (Usually same as SEC_ARM_LENGTH)
+const float HOME_POS_OFFSET_Y = 0;    //The distance in Y from the primary arm pivot to zero in cartesian coordinates (Usually same as PRIM_ARM_LENGTH)
 
 const float Y_AXIS_HOME_ANGLE = -20;    //The number of degrees when axis hits end stop during datuming  
 const float X_AXIS_HOME_ANGLE = 0;      //The number of degrees when axis hits end stop during datuming
